@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>RECIPES_API_KEY</key>
+	<string>$(RECIPES_API_KEY)</string>
+	<key>RECIPES_BASE_URL</key>
+	<string>$(RECIPES_BASE_URL)</string>
+	<key>GIDClientID</key>
+	<string>$(GID_CLIENT_ID)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.mariano.cookpad</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>cookpad</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>None</string>
+			<key>CFBundleURLName</key>
+			<string>gsso</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.56324364303-uv841ibc5f5irij6o2g75dlh11t2nm5l</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

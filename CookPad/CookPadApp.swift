@@ -6,9 +6,22 @@
 //
 
 import SwiftUI
+import Swinject
+import FirebaseCore
 
 @main
 struct CookPadApp: App {
+    enum Status {
+        case ok
+        case error
+    }
+    init() {
+        Resolver.shared.register(StorageProtocol.self) { _ in
+            Storage()
+        }.inObjectScope(.container)
+        FirebaseApp.configure()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

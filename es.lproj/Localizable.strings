@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  CookPad
+
+  Created by Mariano Arselan on 12-02-26.
+  
+*/
+
+"Type ingredients..." = "Escriba algún ingrediente...";
+"Log out" = "Cerrar sesión";

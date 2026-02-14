@@ -1,0 +1,13 @@
+//
+//  Debug.xcconfig
+//  CookPad
+//
+//  Created by Mariano Arselan on 09-02-26.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+GID_CLIENT_ID = 56324364303-uv841ibc5f5irij6o2g75dlh11t2nm5l.apps.googleusercontent.com
+RECIPES_BASE_URL = https:/$()/www.themealdb.com
+RECIPES_API_KEY = 65232507
