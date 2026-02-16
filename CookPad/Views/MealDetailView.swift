@@ -17,7 +17,7 @@ struct MealDetailView: View {
     var viewModel = MealDetailViewModel()
     var meal: Meal?
     var id: String?
-    @State var opcty = 1.0
+    @State var opcty = 0.0
     @State var initialOffset: CGFloat = 0.0
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
@@ -25,32 +25,20 @@ struct MealDetailView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundColor(.black)
-                        .frame(width: 10)
-                }
-                Spacer()
-                Image(systemName: "textformat.size")
-                        .frame(width: 20, height: 20)
-                        .onTapGesture {
-                            showFontSizeMenu.toggle()
-                        }
-            }
             switch viewModel.status {
             case .loading:
                 DotsLoadingIndicator()
             case .loaded(let meal):
-                mealDescription(meal)
+                VStack {
+                    header
+                        .padding(.bottom, 10)
+                    mealDescription(meal)
+                }
             case .failed:
                 Text("Cannot find this meal.")
             }
         }
+        .navigationBarBackButtonHidden()
         .onAppear {
             guard let meal else {
                 if let id = id {
@@ -66,34 +54,38 @@ struct MealDetailView: View {
         ScrollView(showsIndicators: false) {
             VStack {
                 if let url = URL(string: meal.thumbnail) {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxWidth: .infinity)
-                            .opacity(opcty)
-                            .scaleEffect(opcty)
-                            .aspectRatio(1, contentMode: .fill)
-                            .onGeometryChange(for: CGRect.self){ proxy in
-                                proxy.frame(in: .global)
-                            } action: { newValue in
-                                if initialOffset == 0.0 {
-                                    initialOffset = newValue.minY
+                    AsyncImage(url: url,
+                               transaction: Transaction(animation: .spring)) { phase in
+                        switch phase {
+                        case .failure(_):
+                            placeholder
+                                .transition(.opacity)
+                        case .empty:
+                            emptyView
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .transition(.opacity)
+                                .frame(maxWidth: .infinity,  maxHeight: .infinity)
+                                .opacity(opcty)
+                                .scaleEffect(opcty)
+                                .onGeometryChange(for: CGRect.self){ proxy in
+                                    proxy.frame(in: .global)
+                                } action: { newValue in
+                                    if initialOffset == 0.0 {
+                                        initialOffset = newValue.minY
+                                    }
+                                    opcty = newValue.minY / (4.0 * initialOffset) + 0.75
+                                    if opcty < 0.0 {
+                                        opcty = 0.0
+                                    }
                                 }
-                                opcty = newValue.minY / (4.0 * initialOffset) + 0.75
-                                if opcty > 1.0 {
-                                    opcty = 1.0
-                                }
-                                if opcty < 0.0 {
-                                    opcty = 0.0
-                                }
-                            }
-                        
-                    } placeholder: {
-                        placeholder
+                        @unknown default:
+                            emptyView
+                        } // switch
+                
                     }
-                } else {
-                    placeholder
                 }
                 HStack {
                     Image(systemName: "clock")
@@ -173,6 +165,26 @@ struct MealDetailView: View {
         }
     }
     
+    private var header: some View {
+        HStack {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(.black)
+                    .frame(width: 10)
+            }
+            Spacer()
+            Image(systemName: "textformat.size")
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        showFontSizeMenu.toggle()
+                    }
+        }
+    }
+    
     struct MeasureIngredient: Identifiable, Hashable {
         var id = UUID()
         var measure: String
@@ -186,9 +198,15 @@ struct MealDetailView: View {
     private var placeholder: some View {
         Image(systemName: "photo.fill")
             .resizable()
-            .scaledToFill()
+            .scaledToFit()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private var emptyView: some View {
+        Rectangle()
+            .foregroundStyle(.clear)
             .frame(maxWidth: .infinity)
-            .aspectRatio(1, contentMode: .fit)
+            .frame(height: 300)
     }
 }
 
