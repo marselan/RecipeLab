@@ -16,9 +16,13 @@ struct CookPadApp: App {
         case error
     }
     init() {
-        Resolver.shared.register(StorageProtocol.self) { _ in
+        let resolver = Resolver.shared
+        resolver.register(StorageProtocol.self) { _ in
             Storage()
         }.inObjectScope(.container)
+        resolver.register(DBIdentityProtocol.self) { _ in
+            DBIdentity()
+        }
         FirebaseApp.configure()
     }
     

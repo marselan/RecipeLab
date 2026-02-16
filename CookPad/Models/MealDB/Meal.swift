@@ -74,7 +74,7 @@ struct Meal: Decodable, Identifiable, Equatable {
         case strMeasure20
     }
     
-    init(id: String, name: String, category: String?, thumbnail: String, ingredients: [String], measures: [String], instructions: String?, ytUrl: String?) {
+    init(id: String, name: String, category: String? = nil, thumbnail: String, ingredients: [String] = [], measures: [String] = [], instructions: String? = nil, ytUrl: String? = nil) {
         self.id = id
         self.name = name
         self.category = category
@@ -146,3 +146,6 @@ struct Meal: Decodable, Identifiable, Equatable {
     }
 }
 
+func fromFavoriteRecipe(_ recipe: FavoriteRecipe) -> Meal {
+    Meal(id: recipe.id ?? "", name: recipe.meal, thumbnail: recipe.mealThumb)
+}

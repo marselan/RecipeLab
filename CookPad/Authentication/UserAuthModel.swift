@@ -10,8 +10,8 @@ import GoogleSignIn
 import Observation
 
 protocol UserAuthModelProtocol {
-    func check()
-    func signIn()
+    func check(_ onLoggedIn: (() -> Void)?)
+    func signIn(_ onLoggedIn: (() -> Void)?)
     func signOut()
     var givenName: String { get }
     var email: String { get }
@@ -36,7 +36,7 @@ class UserAuthModel: UserAuthModelProtocol {
     var imageUrl : String { googleUser?.profile?.imageURL(withDimension: 100)?.absoluteString ?? "" }
     var email: String { googleUser?.profile?.email ?? "Unknown mail" }
     
-    func checkStatus() {
+    func checkStatus(_ onLoggedIn: (() -> Void)? = nil) {
         guard let googleUser = GIDSignIn.sharedInstance.currentUser else {
             googleUser = nil
             status = .loggedOut
@@ -44,20 +44,21 @@ class UserAuthModel: UserAuthModelProtocol {
         }
         self.googleUser = googleUser
         status = .loggedIn
+        onLoggedIn?()
     }
     
-    func check() {
+    func check(_ onLoggedIn: (() -> Void)? = nil) {
         status = .checking
         GIDSignIn.sharedInstance.restorePreviousSignIn { [weak self] user, error in
             if let error {
                 self?.errorMessage = "error: \(error.localizedDescription)"
                 self?.status = .error
             }
-            self?.checkStatus()
+            self?.checkStatus(onLoggedIn)
         }
     }
     
-    func signIn() {
+    func signIn(_ onLoggedIn: (() -> Void)? = nil) {
         guard let rootViewController = (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.rootViewController else {
             return
         }
@@ -66,7 +67,7 @@ class UserAuthModel: UserAuthModelProtocol {
                 self?.errorMessage = "error: \(error.localizedDescription)"
                 self?.status = .error
             }
-            self?.checkStatus()
+            self?.checkStatus(onLoggedIn)
         }
     }
     
@@ -77,8 +78,8 @@ class UserAuthModel: UserAuthModelProtocol {
 }
 
 class MockUserAuthModel: UserAuthModelProtocol {
-    func check() {}
-    func signIn() {}
+    func check(_ onLoggedIn: (() -> Void)? = nil) {}
+    func signIn(_ onLoggedIn: (() -> Void)? = nil) {}
     func signOut() {}
     var givenName: String { "Mock Name" }
     var email: String { "mock@mail.com" }
