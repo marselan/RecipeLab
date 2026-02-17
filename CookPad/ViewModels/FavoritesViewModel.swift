@@ -11,7 +11,8 @@ import Observation
 @Observable
 class FavoritesViewModel {
     
-    enum Status {
+    enum Status: Equatable {
+        case empty
         case loading
         case loaded([Meal])
         case error
@@ -20,17 +21,27 @@ class FavoritesViewModel {
     @ObservationIgnored
     @Inject var dbIdentity: DBIdentityProtocol
     
-    var status: Status = .loading
+    var status: Status = .empty
    
     func fetchFavorites(email: String) {
         Task { @MainActor in
             do {
+                guard status == .empty || status == .error else { return }
                 status = .loading
                 let favorites = try await dbIdentity.fetchFavorites(email: email).map { fromFavoriteRecipe($0) }
                 status = .loaded(favorites)
             } catch {
                 status = .error
             }
+        }
+    }
+    
+    func isFavorite(meal: Meal) -> Bool {
+        switch status {
+        case .loaded(let meals):
+            return meals.contains(where: { $0.id == meal.id })
+        default:
+            return false
         }
     }
     

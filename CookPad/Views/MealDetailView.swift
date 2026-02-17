@@ -15,6 +15,7 @@ struct MealDetailView: View {
     @State private var showFontSizeMenu = false
     
     var viewModel = MealDetailViewModel()
+    @Environment(FavoritesViewModel.self) private var favoritesViewModel
     var meal: Meal?
     var id: String?
     @State var opcty = 0.0
@@ -63,24 +64,32 @@ struct MealDetailView: View {
                         case .empty:
                             emptyView
                         case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .transition(.opacity)
-                                .frame(maxWidth: .infinity,  maxHeight: .infinity)
-                                .opacity(opcty)
-                                .scaleEffect(opcty)
-                                .onGeometryChange(for: CGRect.self){ proxy in
-                                    proxy.frame(in: .global)
-                                } action: { newValue in
-                                    if initialOffset == 0.0 {
-                                        initialOffset = newValue.minY
+                            ZStack(alignment: .topTrailing) {
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .transition(.opacity)
+                                    .frame(maxWidth: .infinity,  maxHeight: .infinity)
+                                    .opacity(opcty)
+                                    .scaleEffect(opcty)
+                                    .onGeometryChange(for: CGRect.self){ proxy in
+                                        proxy.frame(in: .global)
+                                    } action: { newValue in
+                                        if initialOffset == 0.0 {
+                                            initialOffset = newValue.minY
+                                        }
+                                        opcty = newValue.minY / (4.0 * initialOffset) + 0.75
+                                        if opcty < 0.0 {
+                                            opcty = 0.0
+                                        }
                                     }
-                                    opcty = newValue.minY / (4.0 * initialOffset) + 0.75
-                                    if opcty < 0.0 {
-                                        opcty = 0.0
-                                    }
-                                }
+                                Image(systemName: favoritesViewModel.isFavorite(meal: meal) ? "heart.fill" : "heart")
+                                    .resizable()
+                                    .foregroundStyle(.white)
+                                    .frame(width: 25, height: 25)
+                                    .shadow(color: .black, radius: 5)
+                                    .padding()
+                            }
                         @unknown default:
                             emptyView
                         } // switch

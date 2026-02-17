@@ -14,23 +14,26 @@ struct MainView: View {
         case favorites
     }
     
-    @State private var viewModel = MainViewModel()
+    @State private var mainViewModel = MainViewModel()
+    @State private var favoritesViewModel = FavoritesViewModel()
+    @Environment(\.authService) var authViewModel
     @State private var addMealTapped: Bool = false
     @State private var hamburgerTapped: Bool = false
     @AppStorage("selectedTab") private var selectedTab: TabItem = .meals
+    
     
     private var cols = Array(repeating: GridItem(.flexible()), count: 2)
     
     var body: some View {
         VStack {
-            switch viewModel.status {
-            case .empty:
-                EmptyView()
-            case .loading:
+            switch (favoritesViewModel.status, mainViewModel.status) {
+            case (.loading, _), (_, .loading):
                 DotsLoadingIndicator()
-            case .error:
-                errorView
-            case .loaded(let meals):
+            case (_, .error):
+                reloadRecipesView
+            case (.error, _):
+                reloadFavoritesView
+            case (.loaded(let favorites), .loaded(let meals)):
                 TabView(selection: $selectedTab) {
                     NavigationStack {
                         header
@@ -41,7 +44,7 @@ struct MainView: View {
                         }.accentColor(.black)
                         scrollView(meals)
                             .refreshable {
-                                viewModel.fetchRandomMeals()
+                                mainViewModel.fetchRandomMeals()
                             }
                     }
                     .tabItem {
@@ -64,6 +67,9 @@ struct MainView: View {
                             
                         }
                 }
+                .environment(favoritesViewModel)
+            default:
+                EmptyView()
             }
 
         }
@@ -75,7 +81,8 @@ struct MainView: View {
             SettingsView()
         }
         .onAppear {
-            viewModel.fetchRandomMeals()
+            favoritesViewModel.fetchFavorites(email: authViewModel.email)
+            mainViewModel.fetchRandomMeals()
         }
     }
 }
@@ -105,14 +112,33 @@ extension MainView {
         }
     }
     
-    var errorView: some View {
+    var reloadRecipesView: some View {
         VStack {
             Text("Something went wrong")
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                 .foregroundStyle(.black)
                 .padding()
             Button {
-                viewModel.fetchRandomMeals()
+                mainViewModel.fetchRandomMeals()
+            } label: {
+                Text("Try again")
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .padding()
+            }
+            .background(.blue)
+            .cornerRadius(10)
+        }
+    }
+    
+    var reloadFavoritesView: some View {
+        VStack {
+            Text("Something went wrong")
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .foregroundStyle(.black)
+                .padding()
+            Button {
+                favoritesViewModel.fetchFavorites(email: authViewModel.email)
             } label: {
                 Text("Try again")
                     .font(.system(size: 20, weight: .semibold, design: .rounded))

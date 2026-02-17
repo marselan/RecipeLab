@@ -9,25 +9,10 @@ import Foundation
 import FirebaseFirestore
 
 protocol DBIdentityProtocol {
-    func fetchUserId(email: String) async -> User?
     func fetchFavorites(email: String) async throws -> [FavoriteRecipe]
 }
 
 class DBIdentity: DBIdentityProtocol {
-    
-    func fetchUserId(email: String) async -> User? {
-        let db = Firestore.firestore()
-        
-        let docRef = db.collection("users").document(email)
-        do {
-            let user = try await docRef.getDocument(as: User.self) //else { return nil }
-            return user
-        } catch {
-            print(error)
-            return nil
-            
-        }
-    }
     
     func fetchFavorites(email: String) async throws -> [FavoriteRecipe] {
         let db = Firestore.firestore()

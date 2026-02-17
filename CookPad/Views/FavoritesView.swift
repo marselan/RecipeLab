@@ -9,8 +9,8 @@ import SwiftUI
 
 struct FavoritesView: View {
    
-    @State private var viewModel = FavoritesViewModel()
-    @Environment(\.authService) var authViewModel
+    @Environment(FavoritesViewModel.self) private var viewModel
+    @Environment(\.authService) private var authViewModel
     
     var body: some View {
         VStack {
@@ -35,6 +35,8 @@ struct FavoritesView: View {
                 }
             case .error:
                 Text("Error")
+            case .empty:
+                EmptyView()
             }
         }
         .onAppear() {

@@ -11,6 +11,9 @@ struct MealCardView: View {
     
     var meal: Meal
     
+    @State private var viewModel = FavoritesViewModel()
+    @Environment(\.authService) var authViewModel
+    
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             if let url = URL(string: meal.thumbnail) {
