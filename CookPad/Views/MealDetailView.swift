@@ -89,6 +89,9 @@ struct MealDetailView: View {
                                     .frame(width: 25, height: 25)
                                     .shadow(color: .black, radius: 5)
                                     .padding()
+                                    .onTapGesture { _ in
+                                        favoritesViewModel.toggle(meal: meal)
+                                    }
                             }
                         @unknown default:
                             emptyView

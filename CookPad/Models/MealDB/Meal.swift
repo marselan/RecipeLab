@@ -149,3 +149,7 @@ struct Meal: Decodable, Identifiable, Equatable {
 func fromFavoriteRecipe(_ recipe: FavoriteRecipe) -> Meal {
     Meal(id: recipe.id ?? "", name: recipe.meal, thumbnail: recipe.mealThumb)
 }
+
+func toFavoriteRecipe(_ meal: Meal) -> FavoriteRecipe {
+    FavoriteRecipe(id: meal.id, meal: meal.name, mealThumb: meal.thumbnail)
+}

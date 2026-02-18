@@ -1,13 +1,13 @@
 //
-//  MealRowView.swift
+//  FavoriteRowView.swift
 //  CookPad
 //
-//  Created by Mariano Arselan on 27-01-26.
+//  Created by Mariano Arselan on 18-02-26.
 //
 
 import SwiftUI
 
-struct MealRowView: View {
+struct FavoriteRowView: View {
     
     @Environment(FavoritesViewModel.self) private var favoritesViewModel
     
@@ -21,11 +21,6 @@ struct MealRowView: View {
                         .bold()
                         .multilineTextAlignment(.leading)
                         .foregroundStyle(.black)
-                    Text(ingredients)
-                        .font(.system(.caption, design: .rounded))
-                        .lineLimit(2)
-                        .foregroundStyle(.black)
-                        .multilineTextAlignment(.leading)
                     HStack {
                         Image(systemName: "clock")
                             .resizable()
@@ -35,35 +30,31 @@ struct MealRowView: View {
                             .font(.system(.caption, design: .rounded))
                             .foregroundStyle(.gray)
                         Spacer()
-                        Image(systemName: favoritesViewModel.isFavorite(meal: meal) ? "heart.fill" : "heart")
-                            .resizable()
-                            .foregroundStyle(.black)
-                            .frame(width: 25, height: 25)
-                            .padding()
-                            .onTapGesture { _ in
-                                favoritesViewModel.toggle(meal: meal)
-                            }
                     }
+                    Spacer()
                 } // VStack
                 .padding()
                 Spacer()
             if let url = URL(string: meal.thumbnail) {
-                    
-                    
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .cornerRadius(8)
-                    } placeholder: {
-                        Image(systemName: "photo.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(8)
-                            .foregroundColor(.black)
+                    AsyncImage(url: url) { phase in
+                        
+                        switch phase {
+                        case .failure(let error):
+                            Text("error")
+                        case .empty:
+                           EmptyView()
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .cornerRadius(8)
+                        @unknown default:
+                            EmptyView()
+                        }
+                        
+                        
                     }
-                    
                     
                 } else {
                     Image(systemName: "photo.fill")

@@ -27,7 +27,7 @@ struct FavoritesView: View {
                         ScrollView(showsIndicators: false) {
                             ForEach(meals) { meal in
                                 NavigationLink(destination: MealDetailView(id: meal.id)) {
-                                    MealRowView(meal: meal)
+                                    FavoriteRowView(meal: meal)
                                 }
                             }
                         }

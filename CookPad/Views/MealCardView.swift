@@ -11,30 +11,42 @@ struct MealCardView: View {
     
     var meal: Meal
     
-    @State private var viewModel = FavoritesViewModel()
-    @Environment(\.authService) var authViewModel
+    @Environment(FavoritesViewModel.self) private var favoritesViewModel
     
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
+        VStack {
             if let url = URL(string: meal.thumbnail) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .foregroundColor(.black)
-                } placeholder: {
-                    Image(systemName: "photo.fill")
-                        .resizable()
-                        .foregroundColor(.black)
+                ZStack(alignment: .bottomLeading) {
+                    AsyncImage(url: url) { image in
+                        ZStack(alignment: .topTrailing) {
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .foregroundColor(.black)
+                            Image(systemName: favoritesViewModel.isFavorite(meal: meal) ? "heart.fill" : "heart")
+                                .resizable()
+                                .foregroundStyle(.white)
+                                .frame(width: 25, height: 25)
+                                .shadow(color: .black, radius: 5)
+                                .padding()
+                                .onTapGesture { _ in
+                                    favoritesViewModel.toggle(meal: meal)
+                                }
+                        }
+                    } placeholder: {
+                        Image(systemName: "photo.fill")
+                            .resizable()
+                            .foregroundColor(.black)
+                    }
+                    Text(meal.name)
+                        .font(.system(.headline, design: .rounded))
+                        .multilineTextAlignment(.leading)
+                        .padding(.bottom, 10)
+                        .padding(.leading, 10)
+                        .fontWeight(.black)
+                        .foregroundColor(.white)
+                        .shadow(color: .black, radius: 4)
                 }
-                Text(meal.name)
-                    .font(.system(.headline, design: .rounded))
-                    .multilineTextAlignment(.leading)
-                    .padding(.bottom, 10)
-                    .padding(.leading, 10)
-                    .fontWeight(.black)
-                    .foregroundColor(.white)
-                    .shadow(color: .black, radius: 4)
             } else {
                 Image(systemName: "photo.fill")
                     .resizable()

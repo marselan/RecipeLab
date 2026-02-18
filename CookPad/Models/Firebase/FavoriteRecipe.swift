@@ -9,7 +9,7 @@ import Foundation
 import FirebaseFirestore
 
 struct FavoriteRecipe: Codable, Identifiable {
+    @DocumentID var id: String?
     var meal: String
     var mealThumb: String
-    @DocumentID var id: String?
 }
