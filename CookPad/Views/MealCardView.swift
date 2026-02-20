@@ -14,10 +14,10 @@ struct MealCardView: View {
     @Environment(FavoritesViewModel.self) private var favoritesViewModel
     
     var body: some View {
-        VStack {
-            if let url = URL(string: meal.thumbnail) {
-                ZStack(alignment: .bottomLeading) {
-                    AsyncImage(url: url) { image in
+            ZStack(alignment: .bottomLeading) {
+                AsyncCachedImage(urlString: meal.thumbnail) { phase in
+                    switch phase {
+                    case .loaded(let image):
                         ZStack(alignment: .topTrailing) {
                             image
                                 .resizable()
@@ -33,25 +33,20 @@ struct MealCardView: View {
                                     favoritesViewModel.toggle(meal: meal)
                                 }
                         }
-                    } placeholder: {
+                    default:
                         Image(systemName: "photo.fill")
                             .resizable()
                             .foregroundColor(.black)
                     }
-                    Text(meal.name)
-                        .font(.system(.headline, design: .rounded))
-                        .multilineTextAlignment(.leading)
-                        .padding(.bottom, 10)
-                        .padding(.leading, 10)
-                        .fontWeight(.black)
-                        .foregroundColor(.white)
-                        .shadow(color: .black, radius: 4)
                 }
-            } else {
-                Image(systemName: "photo.fill")
-                    .resizable()
-                    .foregroundColor(.black)
-            }
+                Text(meal.name)
+                    .font(.system(.headline, design: .rounded))
+                    .multilineTextAlignment(.leading)
+                    .padding(.bottom, 10)
+                    .padding(.leading, 10)
+                    .fontWeight(.black)
+                    .foregroundColor(.white)
+                    .shadow(color: .black, radius: 4)
         }
         .cornerRadius(14)
         .aspectRatio(1.2, contentMode: .fit)

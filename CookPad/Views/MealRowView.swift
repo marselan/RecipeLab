@@ -15,63 +15,54 @@ struct MealRowView: View {
     
     var body: some View {
         HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(meal.name)
-                        .font(.system(.callout, design: .rounded))
-                        .bold()
-                        .multilineTextAlignment(.leading)
-                        .foregroundStyle(.black)
-                    Text(ingredients)
+            VStack(alignment: .leading, spacing: 10) {
+                Text(meal.name)
+                    .font(.system(.callout, design: .rounded))
+                    .bold()
+                    .multilineTextAlignment(.leading)
+                    .foregroundStyle(.black)
+                Text(ingredients)
+                    .font(.system(.caption, design: .rounded))
+                    .lineLimit(2)
+                    .foregroundStyle(.black)
+                    .multilineTextAlignment(.leading)
+                HStack {
+                    Image(systemName: "clock")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(.gray)
+                    Text("25 min")
                         .font(.system(.caption, design: .rounded))
-                        .lineLimit(2)
+                        .foregroundStyle(.gray)
+                    Spacer()
+                    Image(systemName: favoritesViewModel.isFavorite(meal: meal) ? "heart.fill" : "heart")
+                        .resizable()
                         .foregroundStyle(.black)
-                        .multilineTextAlignment(.leading)
-                    HStack {
-                        Image(systemName: "clock")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundStyle(.gray)
-                        Text("25 min")
-                            .font(.system(.caption, design: .rounded))
-                            .foregroundStyle(.gray)
-                        Spacer()
-                        Image(systemName: favoritesViewModel.isFavorite(meal: meal) ? "heart.fill" : "heart")
-                            .resizable()
-                            .foregroundStyle(.black)
-                            .frame(width: 25, height: 25)
-                            .padding()
-                            .onTapGesture { _ in
-                                favoritesViewModel.toggle(meal: meal)
-                            }
-                    }
-                } // VStack
-                .padding()
-                Spacer()
-            if let url = URL(string: meal.thumbnail) {
-                    
-                    
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .cornerRadius(8)
-                    } placeholder: {
-                        Image(systemName: "photo.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(8)
-                            .foregroundColor(.black)
-                    }
-                    
-                    
-                } else {
+                        .frame(width: 25, height: 25)
+                        .padding()
+                        .onTapGesture { _ in
+                            favoritesViewModel.toggle(meal: meal)
+                        }
+                }
+            } // VStack
+            .padding()
+            Spacer()
+            AsyncCachedImage(urlString: meal.thumbnail) { phase in
+                switch phase {
+                case .loaded(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .cornerRadius(8)
+                default:
                     Image(systemName: "photo.fill")
                         .resizable()
-                        .foregroundColor(.black)
-                        .scaledToFill()
+                        .scaledToFit()
                         .cornerRadius(8)
+                        .foregroundColor(.black)
                 }
+            }
         }
     }
     

@@ -12,6 +12,8 @@ struct FavoritesView: View {
     @Environment(FavoritesViewModel.self) private var viewModel
     @Environment(\.authService) private var authViewModel
     
+    private var cols = Array(repeating: GridItem(.flexible()), count: 1)
+    
     var body: some View {
         VStack {
             switch viewModel.status {
@@ -25,9 +27,11 @@ struct FavoritesView: View {
                             .font(.system(size: 24, weight: .bold, design: .rounded))
                             .padding()
                         ScrollView(showsIndicators: false) {
-                            ForEach(meals) { meal in
-                                NavigationLink(destination: MealDetailView(id: meal.id)) {
-                                    FavoriteRowView(meal: meal)
+                            LazyVGrid(columns: cols) {
+                                ForEach(meals) { meal in
+                                    NavigationLink(destination: MealDetailView(id: meal.id)) {
+                                        FavoriteRowView(meal: meal)
+                                    }
                                 }
                             }
                         }

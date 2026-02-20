@@ -14,56 +14,48 @@ struct FavoriteRowView: View {
     var meal: Meal
     
     var body: some View {
-        HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(meal.name)
-                        .font(.system(.callout, design: .rounded))
-                        .bold()
-                        .multilineTextAlignment(.leading)
-                        .foregroundStyle(.black)
-                    HStack {
-                        Image(systemName: "clock")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundStyle(.gray)
-                        Text("25 min")
-                            .font(.system(.caption, design: .rounded))
-                            .foregroundStyle(.gray)
-                        Spacer()
-                    }
-                    Spacer()
-                } // VStack
-                .padding()
-                Spacer()
-            if let url = URL(string: meal.thumbnail) {
-                    AsyncImage(url: url) { phase in
-                        
-                        switch phase {
-                        case .failure(let error):
-                            Text("error")
-                        case .empty:
-                           EmptyView()
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
-                                .cornerRadius(8)
-                        @unknown default:
-                            EmptyView()
-                        }
-                        
-                        
-                    }
-                    
-                } else {
-                    Image(systemName: "photo.fill")
+        HStack {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(meal.name)
+                    .font(.system(.callout, design: .rounded))
+                    .bold()
+                    .multilineTextAlignment(.leading)
+                    .foregroundStyle(.black)
+                HStack {
+                    Image(systemName: "clock")
                         .resizable()
-                        .foregroundColor(.black)
-                        .scaledToFill()
-                        .cornerRadius(8)
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(.gray)
+                    Text("25 min")
+                        .font(.system(.caption, design: .rounded))
+                        .foregroundStyle(.gray)
+                    Spacer()
                 }
-        }
+                Spacer()
+            } // VStack
+            .padding()
+            Spacer()
+            AsyncCachedImage(urlString: meal.thumbnail) { phase in
+                switch phase {
+                case .loaded(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .cornerRadius(8)
+                default:
+                    photoImage
+                }
+            }
+        }.fixedSize(horizontal: false, vertical: true)
+    }
+    
+    private var photoImage: some View {
+        Image(systemName: "photo.fill")
+            .resizable()
+            .scaledToFit()
+            .cornerRadius(8)
+            .foregroundColor(.black)
     }
     
     private var ingredients: String {
@@ -77,9 +69,7 @@ struct FavoriteRowView: View {
 }
 
 #Preview {
-    VStack {
-        MealRowView(meal: Meal(id: "", name: "Stew", category: "Some category", thumbnail: "https://www.themealdb.com/images/media/meals/g046bb1663960946.jpg", ingredients: ["garlic", "olive oil", "tomatoes"], measures: [], instructions: "Mix everything", ytUrl: ""))
+    FavoriteRowView(meal: Meal(id: "", name: "Stew", category: "Some category", thumbnail: "https://www.themealdb.com/images/media/meals/g046bb1663960946.jpg", ingredients: ["garlic", "olive oil", "tomatoes"], measures: [], instructions: "Mix everything", ytUrl: ""))
             .padding()
-    }
- //   .background(.gray)
+            .environment(FavoritesViewModel())
 }

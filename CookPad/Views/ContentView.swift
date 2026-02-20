@@ -45,14 +45,18 @@ struct ContentView: View {
         }
     }
     
-    
     var profilePic: some View {
-        AsyncImage(url: URL(string: authViewModel.imageUrl)) { image in
+        AsyncCachedImage(urlString: authViewModel.imageUrl) { phase in
+            switch phase {
+            case .loaded(let image):
                 image
-                .resizable()
-                .frame(width: 100, height: 100)
-        } placeholder: {
-            defaultPic
+                    .resizable()
+                    .frame(width: 100, height: 100)
+            case .loading:
+                defaultPic
+            case .error:
+                defaultPic
+            }
         }
     }
     
