@@ -22,17 +22,34 @@ class ImageLoader: ImageLoaderProtocol {
         case imageDecodingFailed
     }
     
+    private var cache: NSCache<NSString, UIImage> = .init()
+    
+    init() {
+        cache.countLimit = 100
+    }
+    
     func load(urlString: String) async throws -> Image {
+        if cache.object(forKey: urlString as NSString) != nil {
+            let uiImage = cache.object(forKey: urlString as NSString) ?? UIImage()
+            return Image(uiImage: uiImage)
+        }
         guard let url = URL(string: urlString) else { throw Error.urlCreationFailed }
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
-            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                print("response: \(response)")
-                ; throw Error.connectionFailed }
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { throw Error.connectionFailed }
             guard let uiImage = UIImage(data: data) else { throw Error.imageDecodingFailed }
-           return Image(uiImage: uiImage)            
+            cache.setObject(uiImage, forKey: urlString as NSString)
+           return Image(uiImage: uiImage)
         } catch {
             throw Error.connectionFailed
         }
     }
+}
+
+class MockImageLoader: ImageLoaderProtocol {
+    func load(urlString: String) async throws -> Image {
+        Image(systemName: "star")
+    }
+    
+    
 }

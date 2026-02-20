@@ -23,6 +23,9 @@ struct CookPadApp: App {
         resolver.register(DBIdentityProtocol.self) { _ in
             DBIdentity()
         }
+        resolver.register(ImageLoaderProtocol.self) { _ in
+            ImageLoader()
+        }
         FirebaseApp.configure()
     }
     

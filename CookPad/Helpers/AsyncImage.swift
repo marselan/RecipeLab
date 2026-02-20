@@ -14,7 +14,8 @@ enum ImagePhase: Equatable {
 }
 
 struct AsyncCachedImage<Content: View>: View {
-    private let imageLoader = ImageLoader()
+    @Inject
+    private var imageLoader: ImageLoaderProtocol
     @State private var phase: ImagePhase = .loading
     private var urlString: String
     private var content: (ImagePhase) -> Content
