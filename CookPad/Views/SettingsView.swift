@@ -43,6 +43,8 @@ struct SettingsView: View {
             }
             .foregroundStyle(.black)
             Spacer()
+            Text("Developed by **Mariano Arselan** © 2026")
+                .font(.system(size: 10, weight: .regular, design: .rounded))
         }
     }
     

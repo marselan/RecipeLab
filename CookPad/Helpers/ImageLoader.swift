@@ -23,12 +23,13 @@ class ImageLoader: ImageLoaderProtocol {
     }
     
     private var cache: NSCache<NSString, UIImage> = .init()
-    
-    init() {
-        cache.countLimit = 100
-    }
+    private var initialized = false
     
     func load(urlString: String) async throws -> Image {
+        if !initialized {
+            cache.countLimit = 100
+            initialized = true
+        }
         if cache.object(forKey: urlString as NSString) != nil {
             let uiImage = cache.object(forKey: urlString as NSString) ?? UIImage()
             return Image(uiImage: uiImage)
