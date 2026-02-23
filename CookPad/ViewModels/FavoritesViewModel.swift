@@ -19,7 +19,7 @@ class FavoritesViewModel {
     }
     
     @ObservationIgnored
-    @Inject var dbIdentity: DBIdentityProtocol
+    @Inject var storage: StorageProtocol
     private var email = ""
     
     var status: Status = .empty
@@ -29,7 +29,7 @@ class FavoritesViewModel {
             do {
                 guard status == .empty || status == .error else { return }
                 status = .loading
-                let favorites = try await dbIdentity.fetchFavorites(email: email).map { fromFavoriteRecipe($0) }
+                let favorites = try await storage.fetchFavorites(email: email).map { fromFavoriteRecipe($0) }
                 status = .loaded(favorites)
                 self.email = email
             } catch {
@@ -59,7 +59,7 @@ class FavoritesViewModel {
         Task { @MainActor in
             switch self.status {
             case .loaded(var meals):
-                guard let _ = try? await dbIdentity.addFavorite(email: email, favoriteRecipe: toFavoriteRecipe(meal)) else { return }
+                guard let _ = try? await storage.addFavorite(email: email, favoriteRecipe: toFavoriteRecipe(meal)) else { return }
                 
                 meals.append(meal)
                 status = .loaded(meals)
@@ -73,7 +73,7 @@ class FavoritesViewModel {
         Task { @MainActor in
             switch self.status {
             case .loaded(var meals):
-                guard let _ = try? await dbIdentity.removeFavorite(email: email, id: meal.id) else { return }
+                guard let _ = try? await storage.removeFavorite(email: email, id: meal.id) else { return }
                 guard let index = meals.firstIndex(where: { $0.id == meal.id }) else { return }
                 meals.remove(at: index)
                 status = .loaded(meals)

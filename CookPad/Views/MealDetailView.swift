@@ -13,6 +13,7 @@ struct MealDetailView: View {
     
     @AppStorage("text-font-size") var textFontSize = 12.0
     @State private var showFontSizeMenu = false
+    @State private var showAddNoteSheet = false
     
     var viewModel = MealDetailViewModel()
     @Environment(FavoritesViewModel.self) private var favoritesViewModel
@@ -31,9 +32,9 @@ struct MealDetailView: View {
                 DotsLoadingIndicator()
             case .loaded(let meal):
                 VStack {
-                    header
-                        .padding(.bottom, 10)
+                    header(meal)
                     mealDescription(meal)
+                    
                 }
             case .failed:
                 Text("Cannot find this meal.")
@@ -82,15 +83,6 @@ struct MealDetailView: View {
                                         if opcty < 0.0 {
                                             opcty = 0.0
                                         }
-                                    }
-                                Image(systemName: favoritesViewModel.isFavorite(meal: meal) ? "heart.fill" : "heart")
-                                    .resizable()
-                                    .foregroundStyle(.white)
-                                    .frame(width: 25, height: 25)
-                                    .shadow(color: .black, radius: 5)
-                                    .padding()
-                                    .onTapGesture { _ in
-                                        favoritesViewModel.toggle(meal: meal)
                                     }
                             }
                         @unknown default:
@@ -174,10 +166,14 @@ struct MealDetailView: View {
                     Text("Invalid URL for video.")
                 }
             }
+            .sheet(isPresented: $showAddNoteSheet) {
+                AddNoteView()
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
     
-    private var header: some View {
+    private func header(_ meal: Meal) -> some View {
         HStack {
             Button {
                 dismiss()
@@ -189,11 +185,33 @@ struct MealDetailView: View {
                     .frame(width: 10)
             }
             Spacer()
+            Image(systemName: "pencil.tip.crop.circle.badge.plus")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(.black)
+                .frame(width: 20, height: 20)
+                .padding(.trailing, 10)
+                .onTapGesture { _ in
+                    showAddNoteSheet.toggle()
+                }
+            Image(systemName: favoritesViewModel.isFavorite(meal: meal) ? "heart.fill" : "heart")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(.black)
+                .frame(width: 20, height: 20)
+                .padding(.trailing, 10)
+                .onTapGesture { _ in
+                    favoritesViewModel.toggle(meal: meal)
+                }
             Image(systemName: "textformat.size")
-                    .frame(width: 20, height: 20)
-                    .onTapGesture {
-                        showFontSizeMenu.toggle()
-                    }
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 20)
+                .foregroundStyle(.black)
+                .frame(width: 20, height: 20)
+                .onTapGesture {
+                    showFontSizeMenu.toggle()
+                }
         }
     }
     
@@ -224,4 +242,5 @@ struct MealDetailView: View {
 
 #Preview {
     MealDetailView(meal: Meal(id: "", name: "Chicken Pie", category: "category", thumbnail: "https://www.themealdb.com/images/media/meals/1549542994.jpg", ingredients: ["Chicken", "flour", "salt", "pepper"], measures: ["1 kg", "200 g", "1 tsp", "2 tsp"], instructions: "Mix everything", ytUrl: ""))
+        .environment(FavoritesViewModel())
 }

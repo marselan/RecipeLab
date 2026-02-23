@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import FirebaseFirestore
 
 enum StorageError: Error {
     case noDataAvailable
@@ -21,7 +22,11 @@ protocol StorageProtocol {
     func getRandomMeals() async throws -> [Meal]
     func getMeals(name: String) async throws -> [Meal]
     func getMeals(ingredient: String) async throws -> [Meal]
-    func getMeal(id: String) async throws -> Meal?    
+    func getMeal(id: String) async throws -> Meal?
+    
+    func fetchFavorites(email: String) async throws -> [FavoriteRecipe]
+    func addFavorite(email: String, favoriteRecipe: FavoriteRecipe) async throws
+    func removeFavorite(email: String, id: String) async throws
 }
 
 class Storage: StorageProtocol {
@@ -84,5 +89,26 @@ class Storage: StorageProtocol {
         let meals = try JSONDecoder().decode(Meals.self, from: data)
         guard let meals = meals.meals else { return [] }
         return meals
+    }
+    
+    func fetchFavorites(email: String) async throws -> [FavoriteRecipe] {
+        let db = Firestore.firestore()
+        let snapshot = try await db.collection("users").document(email).collection("favorites").getDocuments()
+        
+        let favorites = snapshot.documents.compactMap { document in
+            try? document.data(as: FavoriteRecipe.self)
+        }
+        return favorites
+    }
+    
+    func addFavorite(email: String, favoriteRecipe: FavoriteRecipe) async throws {
+        let db = Firestore.firestore()
+        guard let id = favoriteRecipe.id else { return }
+        try db.collection("users").document(email).collection("favorites").document(id).setData(from: favoriteRecipe)
+    }
+    
+    func removeFavorite(email: String, id: String) async throws {
+        let db = Firestore.firestore()
+        try await db.collection("users").document(email).collection("favorites").document(id).delete()
     }
 }

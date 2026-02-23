@@ -20,9 +20,6 @@ struct CookPadApp: App {
         resolver.register(StorageProtocol.self) { _ in
             Storage()
         }.inObjectScope(.container)
-        resolver.register(DBIdentityProtocol.self) { _ in
-            DBIdentity()
-        }
         resolver.register(ImageLoaderProtocol.self) { _ in
             ImageLoader()
         }
