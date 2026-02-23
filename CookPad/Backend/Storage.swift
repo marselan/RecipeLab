@@ -16,6 +16,7 @@ enum StorageError: Error {
     case unknown
     case invalidResponse
     case invalidConfiguration
+    case invalidId
 }
 
 protocol StorageProtocol {
@@ -27,6 +28,9 @@ protocol StorageProtocol {
     func fetchFavorites(email: String) async throws -> [FavoriteRecipe]
     func addFavorite(email: String, favoriteRecipe: FavoriteRecipe) async throws
     func removeFavorite(email: String, id: String) async throws
+    
+    func fetchNote(email: String, id: String) async throws -> Note?
+    func saveNote(email: String, note: Note) async throws
 }
 
 class Storage: StorageProtocol {
@@ -103,7 +107,7 @@ class Storage: StorageProtocol {
     
     func addFavorite(email: String, favoriteRecipe: FavoriteRecipe) async throws {
         let db = Firestore.firestore()
-        guard let id = favoriteRecipe.id else { return }
+        guard let id = favoriteRecipe.id else { throw StorageError.invalidId }
         try db.collection("users").document(email).collection("favorites").document(id).setData(from: favoriteRecipe)
     }
     
@@ -111,4 +115,17 @@ class Storage: StorageProtocol {
         let db = Firestore.firestore()
         try await db.collection("users").document(email).collection("favorites").document(id).delete()
     }
+    
+    func fetchNote(email: String, id: String) async throws -> Note? {
+        let db = Firestore.firestore()
+        let document = try await db.collection("users").document(email).collection("notes").document(id).getDocument()
+        return try? document.data(as: Note.self)
+    }
+    
+    func saveNote(email: String, note: Note) async throws {
+        let db = Firestore.firestore()
+        guard let id = note.id else { throw StorageError.invalidId }
+        try db.collection("users").document(email).collection("notes").document(id).setData(from: note)
+    }
 }
+

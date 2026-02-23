@@ -34,7 +34,6 @@ struct MealDetailView: View {
                 VStack {
                     header(meal)
                     mealDescription(meal)
-                    
                 }
             case .failed:
                 Text("Cannot find this meal.")
@@ -167,7 +166,7 @@ struct MealDetailView: View {
                 }
             }
             .sheet(isPresented: $showAddNoteSheet) {
-                AddNoteView()
+                AddNoteView(id: meal.id)
                     .presentationDragIndicator(.visible)
             }
         }
