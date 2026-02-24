@@ -20,6 +20,10 @@ class MealDetailViewModel {
         case failed
     }
     
+    init() {
+        print()
+    }
+    
     var status: Status = .loading
     
     func fetchMeal(id: String) {

@@ -40,7 +40,7 @@ struct MainView: View {
                 reloadRecipesView
             case (.error, _):
                 reloadFavoritesView
-            case (.loaded(let favorites), .loaded(let meals)):
+            case (.loaded(_), .loaded(let meals)):
                 TabView(selection: $selectedTab) {
                     NavigationStack {
                         header

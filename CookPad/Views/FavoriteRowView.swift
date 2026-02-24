@@ -54,6 +54,7 @@ struct FavoriteRowView: View {
         Image(systemName: "photo.fill")
             .resizable()
             .scaledToFit()
+            .frame(width: 100)
             .cornerRadius(8)
             .foregroundColor(.black)
     }

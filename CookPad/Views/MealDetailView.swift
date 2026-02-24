@@ -20,7 +20,7 @@ struct MealDetailView: View {
     @State private var showFontSizeMenu = false
     @State private var showAddNoteSheet = false
     
-    var viewModel = MealDetailViewModel()
+    @State var viewModel = MealDetailViewModel()
     @Environment(FavoritesViewModel.self) private var favoritesViewModel
     var meal: Meal?
     var id: String?
