@@ -26,14 +26,33 @@ struct AddNoteView: View {
                 readOnlyView(note)
             case .edit(let mode):
                 editingView(mode)
+            case .errorSaving:
+                editingView(.retry)
             case .errorLoading:
-                Text("Something went wrong")
+                errorLoading
             case .errorSaving:
                 EmptyView()
             }
         }
         .onAppear {
             viewModel.fetchNote(email: authViewModel.email, id: id)
+        }
+    }
+    
+    var errorLoading: some View {
+        VStack {
+            Text("Something went wrong")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+            Button {
+                viewModel.fetchNote(email: authViewModel.email, id: id)
+            } label: {
+                Text("Try again")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(.orange)
+                    .cornerRadius(12)
+            }
         }
     }
     
@@ -83,15 +102,20 @@ struct AddNoteView: View {
                             .stroke(Color(.systemGray5), lineWidth: 1)
                     )
                     .padding(.horizontal)
+                if mode == .retry {
+                    Text("Something went wrong. Try saving again.")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .padding(.top, 20)
+                }
                 Button {
                     viewModel.saveNote()
                 } label: {
-                    Text("Save")
+                    Text(mode == .retry ? "Try again" : "Save")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical)
                         .foregroundStyle(.white)
-                        .background(.blue)
+                        .background(.orange)
                         .cornerRadius(14)
                 }
                 .padding()
@@ -120,6 +144,22 @@ struct AddNoteView: View {
 
 }
 
+// Error Loading note
+#Preview  {
+    Resolver.shared.register(StorageProtocol.self) { _ in
+        AddNoteMockStorageErrorLoadingNote()
+    }
+    return AddNoteView(id: "id").environment(\.authService, MockUserAuthModel())
+}
+
+// Error Saving note
+#Preview  {
+    Resolver.shared.register(StorageProtocol.self) { _ in
+        AddNoteMockStorageErrorSavingNote()
+    }
+    return AddNoteView(id: "id").environment(\.authService, MockUserAuthModel())
+}
+
 class AddNoteMockStorageNewNote: Storage {
     override func fetchNote(email: String, id: String) async throws -> Note? {
         nil
@@ -127,7 +167,6 @@ class AddNoteMockStorageNewNote: Storage {
     override func saveNote(email: String, note: Note) async throws {
         
     }
-
 }
 
 class AddNoteMockStorageUpdateNote: Storage {
@@ -137,5 +176,19 @@ class AddNoteMockStorageUpdateNote: Storage {
     override func saveNote(email: String, note: Note) async throws {
         
     }
+}
 
+class AddNoteMockStorageErrorLoadingNote: Storage {
+    override func fetchNote(email: String, id: String) async throws -> Note? {
+        throw StorageError.unknown
+    }
+}
+
+class AddNoteMockStorageErrorSavingNote: Storage {
+    override func fetchNote(email: String, id: String) async throws -> Note? {
+        Note(id: "id", text: "Remeber to cook evenly each side until it gets brown.")
+    }
+    override func saveNote(email: String, note: Note) async throws {
+        throw StorageError.unknown
+    }
 }

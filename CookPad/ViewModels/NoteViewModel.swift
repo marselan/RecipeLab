@@ -14,6 +14,7 @@ class NoteViewModel {
     enum EditingMode {
         case new
         case update
+        case retry
     }
     
     enum Status {
