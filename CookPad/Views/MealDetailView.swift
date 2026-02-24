@@ -11,6 +11,11 @@ import UIKit
 
 struct MealDetailView: View {
     
+    enum CloseButtonStyle {
+        case cross
+        case back
+    }
+    
     @AppStorage("text-font-size") var textFontSize = 12.0
     @State private var showFontSizeMenu = false
     @State private var showAddNoteSheet = false
@@ -19,6 +24,7 @@ struct MealDetailView: View {
     @Environment(FavoritesViewModel.self) private var favoritesViewModel
     var meal: Meal?
     var id: String?
+    var closeButtonStyle: CloseButtonStyle = .back
     @State var opcty = 0.0
     @State var initialOffset: CGFloat = 0.0
     @Environment(\.dismiss) var dismiss
@@ -177,11 +183,11 @@ struct MealDetailView: View {
             Button {
                 dismiss()
             } label: {
-                Image(systemName: "chevron.left")
+                Image(systemName: closeButtonStyle == .back ? "chevron.left" : "xmark.circle.fill")
                     .resizable()
                     .scaledToFit()
                     .foregroundColor(.black)
-                    .frame(width: 10)
+                    .frame(height: closeButtonStyle == .back ? 20 : 30)
             }
             Spacer()
             Image(systemName: "pencil.tip.crop.circle.badge.plus")

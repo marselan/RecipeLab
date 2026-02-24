@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>RECIPES_API_KEY</key>
-	<string>$(RECIPES_API_KEY)</string>
-	<key>RECIPES_BASE_URL</key>
-	<string>$(RECIPES_BASE_URL)</string>
-	<key>GIDClientID</key>
-	<string>$(GID_CLIENT_ID)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -17,7 +11,7 @@
 			<string>com.mariano.cookpad</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>cookpad</string>
+				<string>recipelab</string>
 			</array>
 		</dict>
 		<dict>
@@ -31,5 +25,11 @@
 			</array>
 		</dict>
 	</array>
+	<key>GIDClientID</key>
+	<string>$(GID_CLIENT_ID)</string>
+	<key>RECIPES_API_KEY</key>
+	<string>$(RECIPES_API_KEY)</string>
+	<key>RECIPES_BASE_URL</key>
+	<string>$(RECIPES_BASE_URL)</string>
 </dict>
 </plist>

@@ -14,12 +14,19 @@ struct MainView: View {
         case favorites
     }
     
+    class MealId {
+        var id: String = ""
+    }
+    
     @State private var mainViewModel = MainViewModel()
     @State private var favoritesViewModel = FavoritesViewModel()
     @Environment(\.authService) var authViewModel
     @State private var addMealTapped: Bool = false
     @State private var hamburgerTapped: Bool = false
     @AppStorage("selectedTab") private var selectedTab: TabItem = .meals
+    
+    @State private var isPresentingMeal = false
+    @State private var mealId = MealId()
     
     
     private var cols = Array(repeating: GridItem(.flexible()), count: 2)
@@ -80,9 +87,20 @@ struct MainView: View {
         .fullScreenCover(isPresented: $hamburgerTapped) {
             SettingsView()
         }
+        .fullScreenCover(isPresented: $isPresentingMeal) {
+            MealDetailView(id: mealId.id, closeButtonStyle: .cross)
+                .padding()
+                .environment(favoritesViewModel)
+        }
         .onAppear {
             favoritesViewModel.fetchFavorites(email: authViewModel.email)
             mainViewModel.fetchRandomMeals()
+        }
+        .onOpenURL { url in
+            if url.host() == "meal" {
+                mealId.id = url.lastPathComponent
+                isPresentingMeal.toggle()
+            }
         }
     }
 }
@@ -126,7 +144,7 @@ extension MainView {
                     .foregroundStyle(.white)
                     .padding()
             }
-            .background(.blue)
+            .background(.orange)
             .cornerRadius(10)
         }
     }
@@ -145,7 +163,7 @@ extension MainView {
                     .foregroundStyle(.white)
                     .padding()
             }
-            .background(.blue)
+            .background(.orange)
             .cornerRadius(10)
         }
     }
