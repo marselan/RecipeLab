@@ -13,7 +13,8 @@ struct SearchMealView: View {
     @Environment(\.dismiss) var dismiss
     @State var searchText: String
     @State var settingsIsPresented: Bool = false
-    private var viewModel = SearchViewModel()
+    @State private var initialized = false
+    @State private var viewModel = SearchViewModel()
     
     init(searchText: String = "") {
         self.searchText = searchText
@@ -62,11 +63,18 @@ struct SearchMealView: View {
             viewModel.clear()
         }
         .onAppear {
-            if !searchText.isEmpty {
-                filterBy = "name"
-                viewModel.fetchMeals(filterBy: filterBy, string: searchText)
+            if !initialized {
+                if !searchText.isEmpty {
+                    filterBy = "name"
+                    viewModel.fetchMeals(filterBy: filterBy, string: searchText)
+                }
+                initialized = true
             }
         }
+    }
+    
+    private protocol InitState {
+        func execute()
     }
     
     @ViewBuilder var resultBody: some View {

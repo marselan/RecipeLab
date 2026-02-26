@@ -44,7 +44,6 @@ struct MainView: View {
                 TabView(selection: $selectedTab) {
                     NavigationStack {
                         header
-                        
                         NavigationLink(destination: SearchMealView()) {
                             FakeSearchBar()
                                 .padding(.vertical)
