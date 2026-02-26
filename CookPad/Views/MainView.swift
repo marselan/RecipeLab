@@ -23,7 +23,7 @@ struct MainView: View {
     @Environment(\.authService) var authViewModel
     @State private var addMealTapped: Bool = false
     @State private var hamburgerTapped: Bool = false
-    @AppStorage("selectedTab") private var selectedTab: TabItem = .meals
+    @SceneStorage("selectedTab") private var selectedTab: TabItem?
     
     @State private var isPresentingMeal = false
     @State private var mealId = MealId()
@@ -66,6 +66,7 @@ struct MainView: View {
                                 .foregroundStyle(selectedTab == .meals ? .blue : .black)
                         }
                     }
+                    .tag(TabItem.meals)
                     FavoritesView()
                         .tabItem {
                             Label("Favorites", systemImage: "star")
@@ -73,6 +74,7 @@ struct MainView: View {
                                 .foregroundStyle(selectedTab == .favorites ? .blue : .black)
                             
                         }
+                        .tag(TabItem.favorites)
                 }
                 .environment(favoritesViewModel)
             default:
