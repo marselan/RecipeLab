@@ -19,7 +19,7 @@ struct MealDetailView: View {
     @AppStorage("text-font-size") var textFontSize = 12.0
     @State private var showFontSizeMenu = false
     @State private var showAddNoteSheet = false
-    
+    @State private var showScheduleSheet = false
     @State var viewModel = MealDetailViewModel()
     @Environment(FavoritesViewModel.self) private var favoritesViewModel
     var meal: Meal?
@@ -175,6 +175,10 @@ struct MealDetailView: View {
                 AddNoteView(id: meal.id)
                     .presentationDragIndicator(.visible)
             }
+            .sheet(isPresented: $showScheduleSheet) {
+                ScheduleView(meal: meal)
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
     
@@ -190,6 +194,15 @@ struct MealDetailView: View {
                     .frame(height: closeButtonStyle == .back ? 20 : 30)
             }
             Spacer()
+            Image(systemName: "calendar.circle")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(.black)
+                .frame(width: 20, height: 20)
+                .padding(.trailing, 10)
+                .onTapGesture { _ in
+                    showScheduleSheet.toggle()
+                }
             Image(systemName: "pencil.tip.crop.circle.badge.plus")
                 .resizable()
                 .scaledToFit()

@@ -12,6 +12,7 @@ struct MainView: View {
     enum TabItem: Int {
         case meals
         case favorites
+        case mealPlan
     }
     
     class MealId {
@@ -74,6 +75,15 @@ struct MainView: View {
                             
                         }
                         .tag(TabItem.favorites)
+                    Text("Meal Plan")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .tabItem {
+                            Label("Meal Plan", systemImage: "calendar")
+                                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                .foregroundStyle(selectedTab == .favorites ? .blue : .black)
+                            
+                        }
+                        .tag(TabItem.mealPlan)
                 }
                 .environment(favoritesViewModel)
             default:

@@ -19,6 +19,12 @@ enum StorageError: Error {
     case invalidId
 }
 
+struct PlannedMeal {
+    let mealId: String
+    let type: Int
+    let date: Date
+}
+
 protocol StorageProtocol {
     func getRandomMeals() async throws -> [Meal]
     func getMeals(name: String) async throws -> [Meal]
@@ -31,6 +37,9 @@ protocol StorageProtocol {
     
     func fetchNote(email: String, id: String) async throws -> Note?
     func saveNote(email: String, note: Note) async throws
+    
+    func scheduleMeal(email: String, plannedMeal: PlannedMeal) async throws -> String
+    func updateScheduledMeal(email: String, id: String, plannedMeal: PlannedMeal) async throws
 }
 
 class Storage: StorageProtocol {
@@ -126,6 +135,19 @@ class Storage: StorageProtocol {
         let db = Firestore.firestore()
         guard let id = note.id else { throw StorageError.invalidId }
         try db.collection("users").document(email).collection("notes").document(id).setData(from: note)
+    }
+    
+    func scheduleMeal(email: String, plannedMeal: PlannedMeal) async throws -> String {
+        let db = Firestore.firestore()
+        let scheduledMeal = ScheduledMeal(mealId: plannedMeal.mealId, type: plannedMeal.type, date: Timestamp(date: plannedMeal.date))
+        let documentRef = try db.collection("users").document(email).collection("scheduledMeals").addDocument(from: scheduledMeal)
+        return documentRef.documentID
+    }
+    
+    func updateScheduledMeal(email: String, id: String, plannedMeal: PlannedMeal) async throws {
+        let db = Firestore.firestore()
+        let scheduledMeal = ScheduledMeal(mealId: plannedMeal.mealId, type: plannedMeal.type, date: Timestamp(date: plannedMeal.date))
+        try db.collection("users").document(email).collection("scheduledMeals").document(id).setData(from: scheduledMeal)
     }
 }
 

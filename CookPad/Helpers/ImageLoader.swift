@@ -15,7 +15,7 @@ protocol ImageLoaderProtocol {
 }
 
 
-class ImageLoader: ImageLoaderProtocol {
+actor ImageLoader: ImageLoaderProtocol {
     enum Error: Swift.Error {
         case urlCreationFailed
         case connectionFailed
