@@ -94,8 +94,7 @@ struct ScheduleView: View {
                 Text("Meal type:")
                     .font(.system(size: 16, weight: .regular, design: .rounded))
                     .padding(.leading, 30)
-                Text(type.stringValue)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                PlannedMealTag(type: type)
                 Spacer()
             }
             Button {
