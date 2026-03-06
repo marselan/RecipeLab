@@ -11,6 +11,7 @@ import Observation
 enum PlannedMealState {
     case loading
     case loaded([PlannedMeal])
+    case empty
     case error
 }
 
@@ -32,7 +33,11 @@ class MealPlanDetailViewModel: MealPlanDetailViewModelProtocol {
             do {
                 state = .loading
                 let meals = try await storage.fetchScheduledMeals(email: email, byMealId: mealId)
-                state = .loaded(meals)
+                if meals.count == 0 {
+                    state = .empty
+                } else {
+                    state = .loaded(meals)
+                }
             } catch {
                 state = .error
             }

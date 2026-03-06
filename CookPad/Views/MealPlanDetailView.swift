@@ -17,6 +17,85 @@ struct MealPlanDetailView: View {
     
     var body: some View {
         VStack {
+            switch viewModel.state {
+            case .loading:
+                DotsLoadingIndicator()
+                    .frame(maxHeight: .infinity)
+            default:
+                ZStack {
+                    header
+                    mainView
+                }
+            }
+        }
+        .navigationBarBackButtonHidden()
+        .onAppear {
+            viewModel.fetchMeals(email: authViewModel.email, mealId: meal.id)
+        }
+    }
+    
+    var mainView: some View {
+        VStack {
+            switch viewModel.state {
+            case .empty:
+                empty
+            case .loaded(let plannedMeals):
+                loaded(plannedMeals)
+            case .error:
+                error
+            default:
+                EmptyView()
+            }
+        }
+    }
+    
+    private var error: some View {
+        VStack {
+            Text("Something went wrong.")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .padding(.top, 40)
+            Button {
+                viewModel.fetchMeals(email: authViewModel.email, mealId: meal.id)
+            } label: {
+                Text("Try again")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .padding()
+                    .foregroundStyle(.white)
+                    .background(.orange)
+                    .cornerRadius(14)
+            }
+        }
+    }
+    
+    private func loaded(_ plannedMeals: [PlannedMeal]) -> some View {
+        VStack {
+            Text(meal.name)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .padding(.top, 40)
+            HStack {
+                Text("You are going to enjoy it on:")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .padding()
+                Spacer()
+            }
+            ScrollView(showsIndicators: false) {
+                ForEach(plannedMeals) { plannedMeal in
+                    HStack {
+                        Text(plannedMeal.date.formatted(date: .long, time: .omitted))
+                            .font(.system(size: 16, weight: .regular, design: .rounded))
+                            .frame(minWidth: 120)
+                            .padding(.horizontal)
+                        PlannedMealTag(type: MealType(rawValue:  plannedMeal.type))
+                        Spacer()
+                    }
+                    .padding(.vertical, 5)
+                }
+            }
+        }
+    }
+    
+    private var header: some View {
+        VStack {
             HStack {
                 Button {
                     dismiss()
@@ -29,41 +108,19 @@ struct MealPlanDetailView: View {
                 }
                 Spacer()
             }
-            switch viewModel.state {
-            case .loading:
-                Text("")
-            case .loaded(let plannedMeals):
-                VStack {
-                    Text(meal.name)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .padding()
-                    HStack {
-                        Text("You are going to enjoy it on:")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .padding()
-                        Spacer()
-                    }
-                    ScrollView(showsIndicators: false) {
-                        ForEach(plannedMeals) { plannedMeal in
-                            HStack {
-                                Text(plannedMeal.date.formatted(date: .long, time: .omitted))
-                                    .font(.system(size: 16, weight: .regular, design: .rounded))
-                                    .frame(minWidth: 120)
-                                    .padding(.horizontal)
-                                PlannedMealTag(type: MealType(rawValue:  plannedMeal.type))
-                                Spacer()
-                            }
-                            .padding(.vertical, 5)
-                        }
-                    }
-                }
-            case .error:
-                Text("Error")
-            }
+            Spacer()
         }
-        .navigationBarBackButtonHidden()
-        .onAppear {
-            viewModel.fetchMeals(email: authViewModel.email, mealId: meal.id)
+    }
+    
+    private var empty: some View {
+        VStack {
+            Text(meal.name)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .padding(.vertical, 60)
+            Text("No plans for this meal yet.")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .padding()
+            Spacer()
         }
     }
 }
@@ -93,6 +150,18 @@ struct PlannedMealTag: View {
     
 }
 
+#Preview {
+    @Previewable @State var viewModel: MealPlanDetailViewModelProtocol = MockEmptyMealPlanDetailViewModel()
+    MealPlanDetailView(viewModel: viewModel, meal: Meal(id: "1", name: "Pollo a la portuguesa", thumbnail: ""))
+    
+}
+
+#Preview {
+    @Previewable @State var viewModel: MealPlanDetailViewModelProtocol = MockErrorMealPlanDetailViewModel()
+    MealPlanDetailView(viewModel: viewModel, meal: Meal(id: "1", name: "Pollo a la portuguesa", thumbnail: ""))
+    
+}
+
 @Observable
 fileprivate class MockMealPlanDetailViewModel: MealPlanDetailViewModel {
     
@@ -103,5 +172,21 @@ fileprivate class MockMealPlanDetailViewModel: MealPlanDetailViewModel {
     
     override func fetchMeals(email: String, mealId: String) {
         state = .loaded(meals)
+    }
+}
+
+@Observable
+fileprivate class MockEmptyMealPlanDetailViewModel: MealPlanDetailViewModel {
+    
+    override func fetchMeals(email: String, mealId: String) {
+        state = .empty
+    }
+}
+
+@Observable
+fileprivate class MockErrorMealPlanDetailViewModel: MealPlanDetailViewModel {
+    
+    override func fetchMeals(email: String, mealId: String) {
+        state = .error
     }
 }
