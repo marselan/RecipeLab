@@ -46,6 +46,7 @@ struct ScheduleView: View {
     @State private var type: MealType = .other
     @State private var viewModel = ScheduleMealViewModel()
     @Environment(\.authService) var authViewModel
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
        switch viewModel.state {
@@ -97,6 +98,19 @@ struct ScheduleView: View {
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                 Spacer()
             }
+            Button {
+                dismiss()
+            } label: {
+                Text("Close")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(.white)
+                    .background(.orange)
+                    .cornerRadius(14)
+            }
+            .padding(.vertical, 40)
+            .padding(.horizontal)
             Spacer()
         }
         .padding(.vertical, 40)
