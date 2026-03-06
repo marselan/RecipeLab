@@ -7,20 +7,40 @@
 
 import SwiftUI
 
-struct ScheduleView: View {
-    enum MealType: Int, CaseIterable, Identifiable {
-        var id: Self  { self }
-        case breakfast, lunch, dinner, other
-        
-        var stringValue: String {
-            switch self {
-            case .breakfast: return "Breakfast"
-            case .lunch: return "Lunch"
-            case .dinner: return "Dinner"
-            case .other: return "Other"
-            }
+
+enum MealType: Int, CaseIterable, Identifiable {
+    var id: Self  { self }
+    case breakfast, lunch, dinner, other
+    
+    var stringValue: String {
+        switch self {
+        case .breakfast: return "Breakfast"
+        case .lunch: return "Lunch"
+        case .dinner: return "Dinner"
+        case .other: return "Other"
         }
     }
+    
+    var tagForegroundColor: Color {
+        switch self {
+        case .breakfast: return .white
+        case .lunch: return .white
+        case .dinner: return .black
+        case .other: return .black
+        }
+    }
+    
+    var tagBackgroundColor: Color {
+        switch self {
+        case .breakfast: return .blue
+        case .lunch: return .orange
+        case .dinner: return .green
+        case .other: return .gray
+        }
+    }
+}
+
+struct ScheduleView: View {
     var meal: Meal
     @State private var selectedDate = Date()
     @State private var type: MealType = .other

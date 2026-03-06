@@ -19,12 +19,6 @@ enum StorageError: Error {
     case invalidId
 }
 
-struct PlannedMeal {
-    let mealId: String
-    let type: Int
-    let date: Date
-}
-
 protocol StorageProtocol {
     func getRandomMeals() async throws -> [Meal]
     func getMeals(name: String) async throws -> [Meal]
@@ -39,7 +33,8 @@ protocol StorageProtocol {
     func saveNote(email: String, note: Note) async throws
     
     func scheduleMeal(email: String, plannedMeal: PlannedMeal) async throws -> String
-    func updateScheduledMeal(email: String, id: String, plannedMeal: PlannedMeal) async throws
+    func updateScheduledMeal(email: String, plannedMeal: PlannedMeal) async throws
+    func fetchScheduledMeals(email: String, byMealId: String) async throws -> [PlannedMeal]
 }
 
 class Storage: StorageProtocol {
@@ -139,15 +134,32 @@ class Storage: StorageProtocol {
     
     func scheduleMeal(email: String, plannedMeal: PlannedMeal) async throws -> String {
         let db = Firestore.firestore()
-        let scheduledMeal = ScheduledMeal(mealId: plannedMeal.mealId, type: plannedMeal.type, date: Timestamp(date: plannedMeal.date))
+        let scheduledMeal = toScheduledMeal(plannedMeal)
         let documentRef = try db.collection("users").document(email).collection("scheduledMeals").addDocument(from: scheduledMeal)
         return documentRef.documentID
     }
     
-    func updateScheduledMeal(email: String, id: String, plannedMeal: PlannedMeal) async throws {
+    func updateScheduledMeal(email: String, plannedMeal: PlannedMeal) async throws {
         let db = Firestore.firestore()
-        let scheduledMeal = ScheduledMeal(mealId: plannedMeal.mealId, type: plannedMeal.type, date: Timestamp(date: plannedMeal.date))
-        try db.collection("users").document(email).collection("scheduledMeals").document(id).setData(from: scheduledMeal)
+        let scheduledMeal = toScheduledMeal(plannedMeal)
+        try db.collection("users").document(email).collection("scheduledMeals").document(plannedMeal.id).setData(from: scheduledMeal)
+    }
+    
+    func fetchScheduledMeals(email: String, byMealId: String) async throws -> [PlannedMeal] {
+        let db = Firestore.firestore()
+        let query = db.collection("users")
+            .document(email)
+            .collection("scheduledMeals")
+            .whereField("mealId", isEqualTo: byMealId)
+        let snapshot = try await query.getDocuments()
+        let scheduledMeals = snapshot.documents.compactMap { doc in
+            try? doc.data(as: ScheduledMeal.self)
+        }
+        return scheduledMeals.map { meal in
+            fromScheduledMeal(meal)
+        }
+        .filter({ $0.date > Calendar.current.startOfDay(for: Date()) })
+        .sorted(by: { $0.date < $1.date })
     }
 }
 

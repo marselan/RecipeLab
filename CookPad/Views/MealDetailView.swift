@@ -112,6 +112,20 @@ struct MealDetailView: View {
                     }
                 }
                 Divider()
+                NavigationLink(destination: MealPlanDetailView(meal: meal)) {
+                    HStack {
+                        Text("Meal Plan")
+                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .padding(.vertical)
+                        Spacer()
+                        Image(systemName:  "chevron.right")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.blue)
+                            .frame(height: 20)
+                    }
+                }
+                Divider()
                 HStack {
                     Text("Ingredients")
                         .font(.system(.title3, design: .rounded))

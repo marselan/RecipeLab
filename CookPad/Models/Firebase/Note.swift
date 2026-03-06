@@ -13,9 +13,3 @@ struct Note: Codable, Identifiable {
     var text: String
 }
 
-struct ScheduledMeal: Codable, Identifiable {
-    @DocumentID var id: String?
-    let mealId: String
-    let type: Int
-    let date: Timestamp
-}

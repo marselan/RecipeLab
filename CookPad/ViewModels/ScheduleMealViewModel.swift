@@ -42,8 +42,8 @@ class ScheduleMealViewModel {
         Task { @MainActor in
             do {
                 state = .saving
-                let scheduledMeal = PlannedMeal(mealId: mealId, type: type, date: date)
-                try await storage.updateScheduledMeal(email: email, id: docId, plannedMeal: scheduledMeal)
+                let scheduledMeal = PlannedMeal(id: docId, mealId: mealId, type: type, date: date)
+                try await storage.updateScheduledMeal(email: email, plannedMeal: scheduledMeal)
                 state = .saved(docId)
             } catch {
                 state = .errorUpdating(docId)
