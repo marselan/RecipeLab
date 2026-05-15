@@ -62,12 +62,15 @@ class UserAuthModel: UserAuthModelProtocol {
         guard let rootViewController = (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.rootViewController else {
             return
         }
-        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [weak self] user, error in
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [weak self] status, error in
             if let error {
                 self?.errorMessage = "error: \(error.localizedDescription)"
                 self?.status = .error
             }
-            self?.checkStatus(onLoggedIn)
+            //self?.checkStatus(onLoggedIn)
+            self?.googleUser = status?.user
+            self?.status = .loggedIn
+            onLoggedIn?()
         }
     }
     

@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Swinject
-import FirebaseCore
+import Firebase
 
 @main
 struct CookPadApp: App {

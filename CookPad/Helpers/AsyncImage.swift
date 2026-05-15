@@ -17,13 +17,8 @@ struct AsyncCachedImage<Content: View>: View {
     @Inject
     private var imageLoader: ImageLoaderProtocol
     @State private var phase: ImagePhase = .loading
-    private var urlString: String
-    private var content: (ImagePhase) -> Content
-    
-    init(urlString: String , @ViewBuilder _ content: @escaping (ImagePhase) -> Content) {
-        self.urlString = urlString
-        self.content = content
-    }
+    var urlString: String
+    @ViewBuilder var content: (ImagePhase) -> Content
     
     var body: some View {
         content(phase)

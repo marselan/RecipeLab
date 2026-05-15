@@ -13,6 +13,7 @@
 		01358CC02F3F6E35009F03AC /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 01358CBF2F3F6E35009F03AC /* FirebaseCore */; };
 		01358CC22F3F6E35009F03AC /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 01358CC12F3F6E35009F03AC /* FirebaseFirestore */; };
 		019D982C2F36449D009A2281 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 019D982B2F36449D009A2281 /* Swinject */; };
+		7FBE3A5B2FB7CDDC0076A2FE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 7FBE3A5A2FB7CDDC0076A2FE /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				010DB42A2F3542A3005BCE64 /* GoogleSignIn in Frameworks */,
+				7FBE3A5B2FB7CDDC0076A2FE /* FirebaseAuth in Frameworks */,
 				010DB42C2F3542A3005BCE64 /* GoogleSignInSwift in Frameworks */,
 				01358CC02F3F6E35009F03AC /* FirebaseCore in Frameworks */,
 				01358CC22F3F6E35009F03AC /* FirebaseFirestore in Frameworks */,
@@ -168,6 +170,7 @@
 				019D982B2F36449D009A2281 /* Swinject */,
 				01358CBF2F3F6E35009F03AC /* FirebaseCore */,
 				01358CC12F3F6E35009F03AC /* FirebaseFirestore */,
+				7FBE3A5A2FB7CDDC0076A2FE /* FirebaseAuth */,
 			);
 			productName = CookPad;
 			productReference = 01F4B4E82F27E3F7002AC849 /* CookPad.app */;
@@ -602,6 +605,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 019D982A2F36449D009A2281 /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
+		};
+		7FBE3A5A2FB7CDDC0076A2FE /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 01358CBE2F3F6E35009F03AC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
