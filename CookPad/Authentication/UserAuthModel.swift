@@ -14,6 +14,7 @@ protocol UserAuthModelProtocol {
     func tryRestoreSession() async
     func signIn() async
     func signOut()
+    var token: String { get }
     var givenName: String { get }
     var email: String { get }
     var imageUrl : String { get }
@@ -31,12 +32,34 @@ class UserAuthModel: UserAuthModelProtocol {
     }
     @ObservationIgnored
     private var googleUser: GIDGoogleUser?
-    
+    @ObservationIgnored
+    private var jwtToken: String?
+    private let attribute = "jwtToken"
     var status: Status = .unknown
+    
     
     var givenName: String { googleUser?.profile?.givenName ?? "Not logged in" }
     var imageUrl : String { googleUser?.profile?.imageURL(withDimension: 100)?.absoluteString ?? "" }
     var email: String { googleUser?.profile?.email ?? "Unknown mail" }
+    
+    var token: String {
+        if let jwtToken {
+            return jwtToken
+        }
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrAccount: attribute,
+            kSecReturnData: true,
+            kSecMatchLimit: kSecMatchLimitOne
+        ]
+        var result: AnyObject?
+        if SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
+           let data = result as? Data,
+           let jwtToken = String(data: data, encoding: .utf8) {
+            return jwtToken
+        }
+        return ""
+    }
     
     func tryRestoreSession() async {
         status = .restoring
@@ -73,6 +96,7 @@ class UserAuthModel: UserAuthModelProtocol {
             let authResult = try await Auth.auth().signIn(with: credential)
             // Save this token in KeyChain
             let token = try await authResult.user.getIDToken()
+            saveToken(token)
             // set status
             await setStatus(.loggedIn, user)
         } catch {
@@ -85,6 +109,22 @@ class UserAuthModel: UserAuthModelProtocol {
         self.googleUser = nil
         self.status = .loggedOut
     }
+    
+    private func saveToken(_ token: String) {
+        let data = Data(token.utf8)
+        // Remove token if exists
+        SecItemDelete([
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrAccount: "jwtToken"
+        ] as CFDictionary)
+        // Save token
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrAccount: "jwtToken",
+            kSecValueData: data
+        ]
+        SecItemAdd(query as CFDictionary, nil)
+    }
 }
 
 class MockUserAuthModel: UserAuthModelProtocol {
@@ -92,6 +132,7 @@ class MockUserAuthModel: UserAuthModelProtocol {
     func tryRestoreSession() async {}
     func signIn() async {}
     func signOut() {}
+    var token: String { "" }
     var givenName: String { "Mock Name" }
     var email: String { "mock@mail.com" }
     var imageUrl : String { "" }
