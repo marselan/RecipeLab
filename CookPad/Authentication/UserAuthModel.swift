@@ -8,6 +8,7 @@
 import Foundation
 import GoogleSignIn
 import Observation
+import FirebaseAuth
 
 protocol UserAuthModelProtocol {
     func check(_ onLoggedIn: (() -> Void)?)
@@ -67,10 +68,41 @@ class UserAuthModel: UserAuthModelProtocol {
                 self?.errorMessage = "error: \(error.localizedDescription)"
                 self?.status = .error
             }
-            //self?.checkStatus(onLoggedIn)
-            self?.googleUser = status?.user
-            self?.status = .loggedIn
-            onLoggedIn?()
+            
+            guard let user = status?.user,
+            let idToken = user.idToken?.tokenString
+            else {
+                self?.errorMessage = "error: no data for user"
+                self?.status = .error
+                return
+            }
+            
+           
+            
+            let accessToken = user.accessToken.tokenString
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+
+            Task {
+                
+                do {
+                    let authResult = try await Auth.auth().signIn(with: credential)
+                    
+                    print(authResult.user.uid)
+                    // Save this token in KeyChain
+                    let token = try await authResult.user.getIDToken()
+                    await MainActor.run { [weak self] in
+                        self?.googleUser = user
+                        self?.status = .loggedIn
+                    }
+                } catch {
+                    print(error)
+                }
+            }
+             
+            
+          
+            
+            
         }
     }
     
