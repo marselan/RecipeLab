@@ -22,7 +22,7 @@ struct ContentView: View {
                     profilePic
                     signInButton
                 }
-            case .checking:
+            case .restoring:
                 DotsLoadingIndicator()
                     .frame(maxHeight: .infinity)
             case .unknown:
@@ -31,15 +31,17 @@ struct ContentView: View {
                 Text("Error in authentication process")
             }
         }
-        .onAppear {
-            authViewModel.check()
+        .task {
+            await authViewModel.tryRestoreSession()
         }
         .environment(\.authService, authViewModel)
     }
     
     var signInButton: some View {
         Button(action: {
-            self.authViewModel.signIn()
+            Task {
+                await self.authViewModel.signIn()
+            }
         }) {
             Text("Sign In")
         }
