@@ -28,7 +28,17 @@ struct ContentView: View {
             case .unknown:
                 EmptyView()
             case .error:
-                Text("Error in authentication process")
+                Button {
+                    Task {
+                        await authViewModel.tryRestoreSession()
+                    }
+                } label: {
+                    Text("Error in authentication process")
+                        .padding()
+                        .foregroundStyle(.white)
+                        .background(.orange)
+                        .cornerRadius(16)
+                }
             }
         }
         .task {

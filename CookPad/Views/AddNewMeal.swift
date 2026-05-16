@@ -71,7 +71,7 @@ struct AddNewMeal: View {
                 ImagePicker(sourceType: .camera, selectedImage: $selectedImage)
             }
         }
-        .onChange(of: selectedImage) { newValue in
+        .onChange(of: selectedImage) { _, newValue in
             image = Image(uiImage: newValue)
         }
     

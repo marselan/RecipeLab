@@ -54,7 +54,7 @@ struct ScheduleView: View {
            saveOrUpdate(docId: docId)
         case .errorSaving:
             Text("Error saving meal")
-       case .errorUpdating(let docId):
+       case .errorUpdating(_):
            Text("Error saving meal")
         case .saved(let docId):
             saved(docId: docId)
@@ -129,7 +129,7 @@ struct ScheduleView: View {
                 }
                 Picker("Meal type", selection: $type) {
                     ForEach(MealType.allCases) { type in
-                        Text("\(type)")
+                        Text(type.stringValue)
                     }
                 }
                 .pickerStyle(.segmented).padding()
@@ -167,3 +167,4 @@ struct ScheduleView: View {
 #Preview {
     ScheduleView(meal: Meal(id: "", name: "Stew", category: "Some category", thumbnail: "https://www.themealdb.com/images/media/meals/g046bb1663960946.jpg", ingredients: ["garlic", "olive oil", "tomatoes"], measures: ["1tbsp", "100gr", "2 cups"], instructions: "Mix everything", ytUrl: ""))
 }
+

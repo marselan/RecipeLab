@@ -58,7 +58,7 @@ struct SearchMealView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
-        .onChange(of: filterBy) { _ in
+        .onChange(of: filterBy) { _, _ in
             searchText = ""
             viewModel.clear()
         }

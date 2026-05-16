@@ -30,8 +30,6 @@ struct AddNoteView: View {
                 editingView(.retry)
             case .errorLoading:
                 errorLoading
-            case .errorSaving:
-                EmptyView()
             }
         }
         .onAppear {
