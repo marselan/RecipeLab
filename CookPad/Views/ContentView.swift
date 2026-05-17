@@ -28,16 +28,25 @@ struct ContentView: View {
             case .unknown:
                 EmptyView()
             case .error:
-                Button {
-                    Task {
-                        await authViewModel.tryRestoreSession()
-                    }
-                } label: {
+                VStack {
                     Text("Error in authentication process")
-                        .padding()
-                        .foregroundStyle(.white)
-                        .background(.orange)
-                        .cornerRadius(16)
+                        .font(.callout)
+                        .fontDesign(.rounded)
+                        .foregroundStyle(.black)
+                    Button {
+                        Task {
+                            await authViewModel.tryRestoreSession()
+                        }
+                    } label: {
+                        Text("Try login again")
+                            .font(.callout)
+                            .fontWeight(.semibold)
+                            .fontDesign(.rounded)
+                            .padding()
+                            .foregroundStyle(.white)
+                            .background(.orange)
+                            .cornerRadius(16)
+                    }
                 }
             }
         }

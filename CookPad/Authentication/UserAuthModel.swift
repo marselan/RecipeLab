@@ -14,7 +14,7 @@ protocol UserAuthModelProtocol {
     func tryRestoreSession() async
     func signIn() async
     func signOut()
-    var token: String { get }
+    var token: String? { get async }
     var givenName: String { get }
     var email: String { get }
     var imageUrl : String { get }
@@ -42,23 +42,10 @@ class UserAuthModel: UserAuthModelProtocol {
     var imageUrl : String { googleUser?.profile?.imageURL(withDimension: 100)?.absoluteString ?? "" }
     var email: String { googleUser?.profile?.email ?? "Unknown mail" }
     
-    var token: String {
-        if let jwtToken {
-            return jwtToken
+    var token: String? {
+        get async {
+            try? await Auth.auth().currentUser?.getIDToken()
         }
-        let query: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: attribute,
-            kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne
-        ]
-        var result: AnyObject?
-        if SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
-           let data = result as? Data,
-           let jwtToken = String(data: data, encoding: .utf8) {
-            return jwtToken
-        }
-        return ""
     }
     
     func tryRestoreSession() async {
@@ -93,10 +80,7 @@ class UserAuthModel: UserAuthModelProtocol {
             let accessToken = user.accessToken.tokenString
             let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
 
-            let authResult = try await Auth.auth().signIn(with: credential)
-            // Save this token in KeyChain
-            let token = try await authResult.user.getIDToken()
-            saveToken(token)
+            _ = try await Auth.auth().signIn(with: credential)
             // set status
             await setStatus(.loggedIn, user)
         } catch {
@@ -125,6 +109,25 @@ class UserAuthModel: UserAuthModelProtocol {
         ]
         SecItemAdd(query as CFDictionary, nil)
     }
+    
+    func getJwtToken() -> String? {
+        if let jwtToken {
+            return jwtToken
+        }
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrAccount: attribute,
+            kSecReturnData: true,
+            kSecMatchLimit: kSecMatchLimitOne
+        ]
+        var result: AnyObject?
+        if SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
+           let data = result as? Data,
+           let jwtToken = String(data: data, encoding: .utf8) {
+            return jwtToken
+        }
+        return nil
+    }
 }
 
 class MockUserAuthModel: UserAuthModelProtocol {
@@ -132,7 +135,7 @@ class MockUserAuthModel: UserAuthModelProtocol {
     func tryRestoreSession() async {}
     func signIn() async {}
     func signOut() {}
-    var token: String { "" }
+    var token: String? { nil }
     var givenName: String { "Mock Name" }
     var email: String { "mock@mail.com" }
     var imageUrl : String { "" }
